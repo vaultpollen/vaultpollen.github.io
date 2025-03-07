@@ -1,1 +1,1 @@
-Portfolio website. Contains mostly data visualizations.
+Portfolio website.
