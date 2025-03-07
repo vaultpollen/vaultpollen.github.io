@@ -4,6 +4,58 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TCG Sales Data 2024</title>
+        <style>
+        body {
+            background-color: #111;
+            color: #eee;
+            font-family: 'Inter', sans-serif;
+            text-align: center;
+            padding: 40px;
+            line-height: 1.6;
+        }
+
+        h1 {
+            font-size: 2rem;
+            text-transform: uppercase;
+            border-bottom: 2px solid #444;
+            display: inline-block;
+            padding-bottom: 5px;
+            margin-top: 40px;
+        }
+
+        a {
+            color: #ddd;
+            text-decoration: underline;
+            font-weight: bold;
+            font-size: 1.2rem;
+            transition: all 0.3s ease-in-out;
+        }
+
+        a:hover {
+            color: white;
+            text-shadow: 0 0 8px white;
+            text-decoration: none;
+            transform: scale(1.05);
+        }
+
+        p {
+            max-width: 600px;
+            margin: 10px auto;
+            font-size: 1.1rem;
+        }
+
+        section {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+
+        .visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+    </style>
 </head>
 <body>
     <p><c><a href="https://vaultpollen.github.io">Home</a></c></p>
