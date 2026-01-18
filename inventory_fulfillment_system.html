@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inventory & Fulfillment System (Excel → SQL-ready)</title>
+  <style>
+    body {
+      background-color: #111;
+      color: #eee;
+      font-family: 'Inter', sans-serif;
+      text-align: center;
+      padding: 40px;
+      line-height: 1.6;
+    }
+
+    h1 {
+      font-size: 2rem;
+      text-transform: uppercase;
+      border-bottom: 2px solid #444;
+      display: inline-block;
+      padding-bottom: 5px;
+      margin-top: 10px;
+    }
+
+    h2 {
+      font-size: 1.6rem;
+      position: relative;
+      display: inline-block;
+      margin: 28px 0 12px 0;
+    }
+
+    h2::after {
+      content: "";
+      display: block;
+      width: 50%;
+      height: 2px;
+      background: linear-gradient(to right, transparent, #777, transparent);
+      margin: 6px auto;
+    }
+
+    .divider {
+      width: 80%;
+      height: 1px;
+      background: linear-gradient(to right, transparent, #444, transparent);
+      margin: 26px auto;
+    }
+
+    .wrap {
+      max-width: 860px;
+      margin: 0 auto;
+      text-align: left;
+    }
+
+    p, li {
+      font-size: 1.08rem;
+      color: #e6e6e6;
+    }
+
+    .meta {
+      color: #bbb;
+      font-size: 1rem;
+      margin: 10px 0 0 0;
+    }
+
+    .pillbar {
+      margin-top: 14px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    .pill {
+      border: 1px solid #444;
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 0.95rem;
+      color: #ddd;
+      background: rgba(255,255,255,0.03);
+      white-space: nowrap;
+    }
+
+    a {
+      color: #ddd;
+      text-decoration: underline;
+      font-weight: bold;
+      transition: all 0.25s ease-in-out;
+    }
+
+    a:hover {
+      color: white;
+      text-shadow: 0 0 8px white;
+      text-decoration: none;
+      transform: translateY(-1px);
+    }
+
+    .callout {
+      border: 1px solid #333;
+      background: rgba(255,255,255,0.03);
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin: 18px 0;
+    }
+
+    .callout b {
+      color: #fff;
+    }
+
+    code, pre {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 0.98rem;
+      color: #eaeaea;
+    }
+
+    pre {
+      background: #0b0b0b;
+      border: 1px solid #2a2a2a;
+      border-radius: 14px;
+      padding: 14px;
+      overflow-x: auto;
+      margin: 12px 0 0 0;
+    }
+
+    ul {
+      margin: 8px 0 0 22px;
+    }
+
+    .foot {
+      margin-top: 30px;
+      color: #aaa;
+      font-size: 0.95rem;
+      text-align: center;
+    }
+
+    .back {
+      display: inline-block;
+      margin-top: 18px;
+      font-size: 1.05rem;
+    }
+
+    section {
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.75s ease-out, transform 0.75s ease-out;
+    }
+
+    .visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Inventory & Fulfillment System</h1>
+  <div class="meta">Excel execution layer · SQL-ready data model · Built for high-volume trading card operations (TCGplayer ecosystem)</div>
+
+  <div class="pillbar">
+    <span class="pill">Data Modeling</span>
+    <span class="pill">CSV Ingestion</span>
+    <span class="pill">Operational Systems</span>
+    <span class="pill">Performance Engineering</span>
+    <span class="pill">Excel Dynamic Arrays</span>
+    <span class="pill">SQL Migration Path</span>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="wrap">
+
+    <section>
+      <h2>What it is</h2>
+      <p>
+        A proprietary inventory management + order fulfillment system built for large-scale trading card singles sales.
+        It links scan-level item data (CSV imports) to physical storage locations (box/segment/batch), enabling fast retrieval
+        without requiring rigid physical alphabetization forever.
+      </p>
+      <div class="callout">
+        <b>Design goal:</b> treat physical inventory as a queryable dataset — stable IDs, normalized attributes, and a location abstraction —
+        so storage can be flexible while picking stays deterministic.
+      </div>
+    </section>
+
+    <section>
+      <h2>Why this matters (real operational constraints)</h2>
+      <ul>
+        <li>High SKU counts and frequent replenishment make constant re-sorting costly and risky (handling/damage).</li>
+        <li>Orders often require many one-off picks; retrieval speed is the bottleneck, not listing.</li>
+        <li>Inventory is physically rebalanced over time; the system must support fast remapping without rework.</li>
+        <li>Excel must remain responsive at scale → formulas and workflows must be performance-aware.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Architecture (SQL-ready by design)</h2>
+      <p>
+        Implemented in Excel for iteration speed, but modeled with relational patterns so the migration to SQL is mechanical:
+        tables map 1:1, lookups become joins, and CSV ingestion becomes ETL.
+      </p>
+
+      <div class="callout">
+        <b>Key design choice:</b> separate <i>identity</i> (what the card is) from <i>location</i> (where it lives), using stable keys.
+      </div>
+
+      <p><b>Core entities (high-level, proprietary details omitted):</b></p>
+      <ul>
+        <li><b>Inventory fact table</b>: one row per inventory instance with a surrogate <code>row_id</code>, attributes (name/set/condition/print), and a <code>batch_id</code> foreign key.</li>
+        <li><b>Batch/location dimension</b>: maps <code>batch_id</code> → physical <code>box_id</code> + <code>segment</code> and a human-readable label for fast navigation.</li>
+        <li><b>Staging/pick table</b>: ephemeral order paste + parsing + status flags (picked / depleted) to keep fulfillment fast and Excel lightweight.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Pipeline: from scan exports to pickable inventory</h2>
+      <p>
+        Ingestion is CSV-driven to stay tool-agnostic. Scans/listing exports from tools in the trading card ecosystem
+        (including ManaBox and TCGplayer workflows) are normalized into a consistent schema.
+      </p>
+      <ul>
+        <li>Standardized headers and types for later DBMS compatibility.</li>
+        <li>Generated stable surrogate keys (<code>row_id</code>) to support deterministic updates and remaps.</li>
+        <li>Batch assignment ties each import chunk to a physical location without enforcing a single “correct” storage strategy.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Picking workflow (built for throughput)</h2>
+      <p>
+        The fulfillment workflow is intentionally optimized for a single-operator, high-frequency environment:
+        quick lookup → pull → mark status → batch-deplete later to avoid slow, repetitive edits during packing.
+      </p>
+      <ul>
+        <li><b>Locator search</b>: query by name and return candidate inventory rows with <code>batch_id</code> and physical location.</li>
+        <li><b>Stable reference</b>: copy <code>row_id</code> during picking to ensure the correct inventory record is updated later.</li>
+        <li><b>Staged depletion</b>: mark <i>picked</i> immediately; mark <i>depleted</i> after bulk inventory updates.</li>
+      </ul>
+      <div class="callout">
+        <b>Operational optimization:</b> designed to reduce physical reshuffling and minimize time spent editing inventory during order packing.
+      </div>
+    </section>
+
+    <section>
+      <h2>Performance engineering (Excel constraints)</h2>
+      <p>
+        The system was iterated to stay fast under growing row counts by avoiding patterns that force workbook-wide recalculation
+        (e.g., ledger-style per-row depletion math across large logs).
+      </p>
+      <ul>
+        <li>Kept “state” tables simple and durable; kept “workflow” tables ephemeral.</li>
+        <li>Reduced dynamic-array fanout where it impacts save/recalc performance.</li>
+        <li>Used keys and dimensions to reduce repeated expensive lookups.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Skills demonstrated</h2>
+      <ul>
+        <li><b>Data modeling:</b> normalized schema patterns, surrogate keys, fact/dimension separation, migration planning.</li>
+        <li><b>ETL / ingestion:</b> CSV normalization, schema hygiene, tool-agnostic import design.</li>
+        <li><b>Systems design:</b> decoupling identity from location; handling re-slotting/remaps without data churn.</li>
+        <li><b>Excel engineering:</b> Tables + structured references, dynamic arrays (LET/FILTER/XLOOKUP), error handling, performance tradeoffs.</li>
+        <li><b>Operational rigor:</b> workflow design for high-throughput fulfillment and low handling risk.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Roadmap (when scale requires a DBMS)</h2>
+      <p>
+        Excel is the current execution layer by choice; the underlying model is intentionally SQL-ready. When volume/throughput crosses the threshold
+        for indexing, concurrency, and transactional updates, the system ports cleanly to a relational database.
+      </p>
+      <ul>
+        <li>Excel tables → SQL tables (same entities and keys)</li>
+        <li>Lookups → JOINs</li>
+        <li>CSV ingestion → ETL jobs</li>
+        <li>Staging workflows → transactional tables / queues</li>
+      </ul>
+      <div class="callout">
+        <b>Proprietary note:</b> detailed schemas, algorithms, and operational heuristics are intentionally withheld.
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <div class="foot">
+      <a class="back" href="../">← Back to home</a>
+    </div>
+
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const sections = document.querySelectorAll("section");
+      const revealOnScroll = () => {
+        sections.forEach((section) => {
+          const sectionTop = section.getBoundingClientRect().top;
+          if (sectionTop < window.innerHeight * 0.92) {
+            section.classList.add("visible");
+          }
+        });
+      };
+      window.addEventListener("scroll", revealOnScroll);
+      revealOnScroll();
+    });
+  </script>
+
+</body>
+</html>
